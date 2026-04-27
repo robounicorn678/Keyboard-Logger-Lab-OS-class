@@ -1,0 +1,1 @@
+savedcmd_/workspaces/Keyboard-Logger-Lab-OS-class/hello_printk.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /workspaces/Keyboard-Logger-Lab-OS-class/hello_printk.ko /workspaces/Keyboard-Logger-Lab-OS-class/hello_printk.o /workspaces/Keyboard-Logger-Lab-OS-class/hello_printk.mod.o
